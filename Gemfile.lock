@@ -1,12 +1,21 @@
+PATH
+  remote: .
+  specs:
+    jekyll-gettext-plugin (0.0.1)
+      fast_gettext (~> 0.8)
+      get_pomo (~> 0.6)
+
 GEM
   remote: https://rubygems.org/
   specs:
     fast_gettext (0.8.1)
     get_pomo (0.6.3)
+    rake (10.1.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
-  fast_gettext (~> 0.8)
-  get_pomo (~> 0.6)
+  bundler (~> 1.5)
+  jekyll-gettext-plugin!
+  rake

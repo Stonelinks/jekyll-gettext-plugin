@@ -1,3 +1,8 @@
+require "jekyll/gettext/plugin/version"
+
+require 'fast_gettext'
+require 'get_pomo'
+
 module Jekyll
   class Site
     alias :process_org :process
