@@ -5,6 +5,7 @@ require 'get_pomo'
 
 module Jekyll
   class Site
+    
     alias :process_org :process
     def process
       if !self.config['baseurl']
@@ -37,12 +38,16 @@ module Jekyll
       puts 'Build complete'
     end
     
-    alias :read_posts_org :read_posts
-    def read_posts(dir)
-      if dir == ''
-        read_posts("_i18n/#{self.config['lang']}/")
-      else
-        read_posts_org(dir)
+
+    # TODO:
+    # parse the yaml file and store it in site whenever lang changes
+    # if a key is missing, add it to a list on site
+    # when site is done processing, write back to master yaml file
+
+    def load_translations
+      unless I18n::backend.instance_variable_get(:@translations)
+        I18n.backend.load_translations Dir[File.join(File.dirname(__FILE__),'../_locales/*.yml')]
+        I18n.locale = LOCALE
       end
     end
   end
