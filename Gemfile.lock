@@ -8,9 +8,16 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
+    coderay (1.1.0)
     fast_gettext (0.8.1)
     get_pomo (0.6.3)
+    method_source (0.8.2)
+    pry (0.9.12.6)
+      coderay (~> 1.0)
+      method_source (~> 0.8)
+      slop (~> 3.4)
     rake (10.1.1)
+    slop (3.4.7)
 
 PLATFORMS
   ruby
@@ -18,4 +25,5 @@ PLATFORMS
 DEPENDENCIES
   bundler (~> 1.5)
   jekyll-gettext-plugin!
+  pry
   rake
