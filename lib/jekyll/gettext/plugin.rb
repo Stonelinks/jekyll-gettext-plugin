@@ -3,9 +3,7 @@ require "jekyll/gettext/plugin/version"
 require 'fast_gettext'
 require 'get_pomo'
 
-require 'pry'
-
-class MissingTranslationLogger
+class TranslationLogger
   def initialize
     @translations = []
   end
@@ -18,7 +16,6 @@ class MissingTranslationLogger
     @translations.push(unfound)
   end
 end
-
 
 module Jekyll
 
@@ -62,15 +59,20 @@ module Jekyll
       puts 'Build complete'
     end
 
+    # TODO:
+    # parse the po file and store it in site whenever lang changes
+    # if a key is missing, add it to a list on site object
+    # when site is done processing, write back to po file
     def load_translations
       FastGettext.add_text_domain(self.config['lang'], :path => self.source + "/_i18n", :type => :po, :ignore_fuzzy => false)
       FastGettext.text_domain = self.config['lang']
       FastGettext.locale = self.config['lang']
 
-      @missing_translations = MissingTranslationLogger.new
+      @all_translations = TranslationLogger.new
+      @missing_translations = TranslationLogger.new
 
       repos = [
-        FastGettext::TranslationRepository.build('logger', :type=>:logger, :callback=>lambda{|_|}),
+        FastGettext::TranslationRepository.build('logger', :type=>:logger, :callback=>@all_translations),
         FastGettext::TranslationRepository.build('logger', :type=>:logger, :callback=>@missing_translations)
       ]
       FastGettext.add_text_domain(self.config['lang'], :type=>:chain, :chain=>repos)
@@ -79,21 +81,26 @@ module Jekyll
     def save_missing_translations
       filename = self.source + "/_i18n/" + self.config['lang'] + '/' + self.config['lang'] + '.po'
       existing_translations = GetPomo.unique_translations(GetPomo::PoFile.parse(File.read(filename)))
-      
+
       # ignores any keys that already exist
-      missing_translations_msgids = @missing_translations.get_translations.reject{|msgid| existing_translations.find{|trans| trans.msgid == msgid}}
+      missing_translations_msgids = @missing_translations.get_translations.reject {|msgid| existing_translations.find { |trans| trans.msgid == msgid } }
       
-      new_translations = existing_translations
+      final_translations = existing_translations
       
       missing_translations_msgids.each do |new_msgid|
         new_trans = GetPomo::Translation.new
         new_trans.msgid = new_msgid
         new_trans.msgstr = ""
-        new_translations.push(new_trans)
+        final_translations.push(new_trans)
       end
-      new_translations.sort_by!(&:msgid)
 
-      File.open(filename + '.test', 'w'){|f|f.print(GetPomo::PoFile.to_text(new_translations))}
+      # uncomment this to remove translations that were not used
+      # not_used = final_translations.reject { |trans| @all_translations.get_translations.find { |msgid| trans.msgid == msgid }}
+      # final_translations = final_translations.reject {|t1| not_used.find {|t2| t1.msgid == t2.msgid}}
+
+      final_translations.sort_by!(&:msgid)
+
+      File.open(filename, 'w'){|f|f.print(GetPomo::PoFile.to_text(final_translations))}
     end
   end
 
