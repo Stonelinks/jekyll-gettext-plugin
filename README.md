@@ -1,8 +1,10 @@
-# Jekyll::Gettext::Plugin
+#Jekyll gettext plugin
 
-A quick and dirty i18n plugin for jekyll based on gettext and po files  
+A quick and dirty i18n plugin for jekyll based on gettext and po files.  
 
-Inspiration taken from [jekyll-multiple-languages-plugin](https://github.com/screeninteraction/jekyll-multiple-languages-plugin), it was just a little overkill for my needs and I wasn't a fan of managing translations in yaml files.
+
+
+A lot of inspiration taken from [jekyll-multiple-languages-plugin](https://github.com/screeninteraction/jekyll-multiple-languages-plugin), it was just a little overkill for my needs and I wasn't a fan of managing translations in yaml files.
 
 ## Installation
 
@@ -20,10 +22,31 @@ Or install it yourself as:
 
 ## Usage
 
-- In _config.yml, add a languages array where the first one is your primary language, for example `languages: ["ja", "ja", "en"]`
-- For each language, make sure there is a po file in `_i18n/<LANG>/<LANG>.po`. So if you're doing japanese translations for the first time you'd do something like `mkdir -p _i18n/ja && touch _i18n/ja/ja.po`
-- Use tags that look like this {% t hey there! %} in your web pages
-- Any time jekyll builds, the plugin will add any new keys to the po file. Fill these in and rebuild to see the translated website. Each translated website is served at a url relative to that language, IE `http://localhost:8080/ja/`, `http://localhost:8080/en/`, etc.
+
+###Configuration
+Add the i18n configuration to your _config.yml:
+
+```yaml	
+languages: ["ja", "en", "ja"]
+```
+
+The first language in the array will be the default language, Japanese and English will be added in to separate subfolders.
+
+###i18n
+Create this folder structure in your Jekyll project as an example:
+
+- _i18n/ja/ja.po
+- _i18n/en/en.po
+
+To add a string to your site use one of these
+
+```liquid	
+{% t key %}
+or 
+{% translate key %}
+```
+	
+Liquid tags. This will pick the correct string from the `language.po` file during compilation, or add it if no translation exists so you can fill it in later.
 
 ## Contributing
 
