@@ -22,6 +22,7 @@ end
 module Jekyll
 
   class Site
+    include FastGettext::Translation
     
     alias :process_org :process
     def process
@@ -77,6 +78,7 @@ module Jekyll
     end
 
     def save_missing_translations
+      self.posts.each {|post| _(post.title)}
       filename = self.source + "/_i18n/" + self.config['lang'] + '/' + self.config['lang'] + '.po'
       existing_translations = GetPomo.unique_translations(GetPomo::PoFile.parse(File.read(filename)))
       
