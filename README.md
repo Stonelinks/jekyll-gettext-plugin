@@ -1,8 +1,10 @@
-# Jekyll::Gettext::Plugin
+#Jekyll gettext plugin
 
-A quick and dirty i18n plugin for jekyll based on gettext and po files  
+A quick and dirty i18n plugin for jekyll based on gettext and po files.  
 
-Inspiration taken from [jekyll-multiple-languages-plugin](https://github.com/screeninteraction/jekyll-multiple-languages-plugin), it was just a little overkill for my needs and I wasn't a fan of managing translations in yaml files.
+
+
+A lot of inspiration taken from [jekyll-multiple-languages-plugin](https://github.com/screeninteraction/jekyll-multiple-languages-plugin), it was just a little overkill for my needs and I wasn't a fan of managing translations in yaml files.
 
 ## Installation
 
@@ -20,7 +22,31 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+
+###Configuration
+Add the i18n configuration to your _config.yml:
+
+```yaml	
+languages: ["ja", "en", "ja"]
+```
+
+The first language in the array will be the default language, Japanese and English will be added in to separate subfolders.
+
+###i18n
+Create this folder structure in your Jekyll project as an example:
+
+- _i18n/ja/ja.po
+- _i18n/en/en.po
+
+To add a string to your site use one of these
+
+```liquid	
+{% t key %}
+or 
+{% translate key %}
+```
+	
+Liquid tags. This will pick the correct string from the `language.po` file during compilation, or add it if no translation exists so you can fill it in later.
 
 ## Contributing
 
