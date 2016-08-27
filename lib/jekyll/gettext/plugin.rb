@@ -24,6 +24,7 @@ module Jekyll
   class Site
     
     alias :process_org :process
+    attr_accessor   :dest
     def process
       if !self.config['baseurl']
         self.config['baseurl'] = ""
