@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    jekyll-gettext-plugin (0.0.3)
+    jekyll-gettext-plugin (0.0.4)
       fast_gettext (~> 0.8)
       get_pomo (~> 0.6)
 
