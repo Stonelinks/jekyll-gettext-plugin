@@ -22,31 +22,76 @@ Or install it yourself as:
 
 ## Usage
 
+###Examples
+
+Have a look at the [examples](examples) folder.
 
 ###Configuration
+
 Add the i18n configuration to your _config.yml:
 
 ```yaml	
-languages: ["ja", "en", "ja"]
+languages: ["en", "ja"]
 ```
 
-The first language in the array will be the default language, Japanese and English will be added in to separate subfolders.
+The first language in the array will be the default language.
+
+Default configuration values:
+
+```yaml
+# the languages to look for
+languages: ["en"]
+
+# the name of the text domain.
+# This is the name of the .pot and .po files.
+text_domain: "website"
+
+# the folder relative to the _config.yml
+# where the translations are placed inside
+translations_folder: "_i18n"
+
+# the files that are ignored by jekyll.
+# This variable is automatically filled to avoid build loops
+exclude: ["_i18n/website.pot"]
+```
 
 ###i18n
+
 Create this folder structure in your Jekyll project as an example:
 
-- _i18n/ja/ja.po
-- _i18n/en/en.po
+- _i18n/ja/website.po
+- _i18n/en/website.po
 
 To add a string to your site use one of these
 
 ```liquid	
+---
+translate: true
+---
+
 {% t key %}
 or 
 {% translate key %}
 ```
 	
 Liquid tags. This will pick the correct string from the `language.po` file during compilation, or add it if no translation exists so you can fill it in later.
+
+All files with a `translate` field inside the yaml header are put in the folders of their languages.
+Without the `translate` field they remain where they are as usual.
+
+You can translate variables in the header like this:
+
+```liquid	
+---
+translate:
+  title: Main Page
+---
+```
+
+All translations automatically turn up in the `_i18n/website.pot` file.
+You can translate them using [Poedit](https://poedit.net/download).
+Whenever you save the po file, a `jekyll serve` rebuilds the site.
+
 
 ## Contributing
 
