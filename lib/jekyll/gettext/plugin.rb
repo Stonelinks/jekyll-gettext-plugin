@@ -139,7 +139,6 @@ module Jekyll
     end
     
     def add_translated_sites
-      languages = site.config['languages']
       default_language = languages.first
       translated_pages = []
       site.pages.reject! do |page|
