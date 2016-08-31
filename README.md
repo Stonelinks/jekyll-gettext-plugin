@@ -92,6 +92,7 @@ All translations automatically turn up in the `_i18n/website.pot` file.
 You can translate them using [Poedit](https://poedit.net/download).
 Whenever you save the po file, a `jekyll serve` rebuilds the site.
 
+Make sure all files are saved in UTF-8 encoding.
 
 ## Contributing
 
