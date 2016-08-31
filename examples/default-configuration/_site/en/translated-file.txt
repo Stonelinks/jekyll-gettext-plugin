@@ -1,0 +1,9 @@
+
+   Translation Example
+   =-=-=-=-=-=-=-=-=-=-   
+
+This file is placed in the folder of the language.
+
+
+--------------------------------------------------------------------------------
+Language: en

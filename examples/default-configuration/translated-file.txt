@@ -1,0 +1,7 @@
+---
+layout: default
+translate:
+  title: Translation Example
+---
+
+{% t This file is placed in the folder of the language. %}
