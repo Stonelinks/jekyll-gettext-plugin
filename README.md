@@ -74,7 +74,7 @@ or
 {% translate key %}
 ```
 	
-Liquid tags. This will pick the correct string from the `language.po` file during compilation, or add it if no translation exists so you can fill it in later.
+These are liquid tags. They will pick the correct string from the correct `website.po` file during compilation for that language, or add it if no translation exists so you can fill it in later.
 
 All files with a `translate` field inside the yaml header are put in the folders of their languages.
 Without the `translate` field they remain where they are as usual.
