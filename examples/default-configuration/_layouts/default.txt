@@ -1,0 +1,9 @@
+{% assign n = page.title | size %}
+   {{ page.title }}
+   {% for i in (0..n) %}{% cycle "=", "-" %}{% endfor %}   
+
+{{ content }}
+
+
+--------------------------------------------------------------------------------
+{% t Language: %} {{ page.language }}

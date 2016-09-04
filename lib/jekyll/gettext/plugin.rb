@@ -2,106 +2,177 @@ require "jekyll/gettext/plugin/version"
 
 require 'fast_gettext'
 require 'get_pomo'
-
 require 'pry'
 
 class TranslationLogger
+
   def initialize
     @translations = []
-  end
-  
-  def get_translations
-    return @translations
   end
   
   def call(unfound)
     @translations.push(unfound)
   end
+  
+  def translations
+      @translations.map do |msgid|
+        translation = GetPomo::Translation.new
+        translation.msgid = msgid
+        translation.msgstr = ""
+        translation
+      end
+  end
 end
 
 module Jekyll
 
+  class Page
+    attr_reader :base
+    
+    def activate
+      raise "Add 'translate: true' to " + relative_path + "."
+    end
+  end
+  
   class Site
+    attr_accessor :pot_localization_plugin
+  end
+
+  class TranslatedPage < Page
     include FastGettext::Translation
     
-    alias :process_org :process
-    attr_accessor   :dest
-    def process
-      if !self.config['baseurl']
-        self.config['baseurl'] = ""
+    attr_reader :language, :default_language
+  
+    def initialize(page, language, default_language)
+      @language = language
+      @default_language = default_language
+      super(page.site, page.base, page.dir, page.name)
+      fill_data
+    end
+    
+    def activate
+      FastGettext.locale = language
+    end
+    
+    def fill_data
+      activate
+      data["language"]= language
+      data["default_language"]= default_language
+      translate = data["translate"]
+      if translate.is_a? Hash
+        translate.each_pair do |key, value|
+          data[key] = _(value)
+        end
       end
-      
-      # variables
-      config['baseurl_root'] = self.config['baseurl']
-      baseurl_org = self.config['baseurl']
-      languages = self.config['languages']
-      dest_org = self.dest
+    end
+    
+    def url
+      "/" + language + super
+    end
+  end
 
-      # loop
-      self.config['lang'] = languages.first
-      puts
-      puts "Building site for default language: \"#{self.config['lang']}\" to: " + self.dest
-      self.load_translations
-      process_org
-      self.save_missing_translations
-      
-      languages.drop(1).each do |lang|
-
-        # build site for language lang
-        self.dest = self.dest + "/" + lang
-        self.config['baseurl'] = self.config['baseurl'] + "/" + lang
-        self.config['lang'] = lang
-        puts "Building site for language: \"#{self.config['lang']}\" to: " + self.dest
-        self.load_translations
-        process_org
-        self.save_missing_translations
-
-        # reset variables for next language
-        self.dest = dest_org
-        self.config['baseurl'] = baseurl_org
+  class PotLocalizationPlugin < Generator
+    safe true
+    
+    attr_reader :site, :translations
+    
+    def text_domain
+      unless site.config.include? "text_domain"
+        site.config["text_domain"] = "website"
       end
-      puts 'Build complete'
+      site.config["text_domain"]
+    end
+    
+    def pot_file
+      translations_folder + "/" + text_domain + ".pot"
+    end
+    
+    def languages
+      unless site.config.include? "languages"
+        site.config["languages"] = ["en"]
+      end
+      site.config["languages"]
+    end
+    
+    def po_file(language)
+      translations_folder + "/" + language + "/" + text_domain + ".po"
     end
 
-    def load_translations
-      @all_translations = TranslationLogger.new
-      @missing_translations = TranslationLogger.new
-
-      repos = [
-        FastGettext::TranslationRepository.build(self.config['lang'], :type=>:logger, :callback=>@all_translations),
-        FastGettext::TranslationRepository.build(self.config['lang'], :type=>:logger, :callback=>@missing_translations),
-        FastGettext::TranslationRepository.build(self.config['lang'], :path => self.source + "/_i18n", :type => :po)
-      ]
-      FastGettext.add_text_domain(self.config['lang'], :type=>:chain, :chain=>repos)
-
-      FastGettext.text_domain = self.config['lang']
-      FastGettext.locale = self.config['lang']
+    def generate(site)
+      @site = site
+      site.pot_localization_plugin = self
+      setup_translations
+      add_translated_sites
     end
+    
+    def setup_translations
+      @translations = TranslationLogger.new
+      
+      renew_translations
 
-    def save_missing_translations
-      self.posts.each {|post| _(post.title)}
-      filename = self.source + "/_i18n/" + self.config['lang'] + '/' + self.config['lang'] + '.po'
-      existing_translations = GetPomo.unique_translations(GetPomo::PoFile.parse(File.read(filename)))
-      
-      # ignores any keys that already exist
-      missing_translations_msgids = @missing_translations.get_translations.reject {|msgid| existing_translations.find {|trans| trans.msgid == msgid}}
-      
-      final_translations = existing_translations
-      
-      missing_translations_msgids.each do |new_msgid|
-        new_trans = GetPomo::Translation.new
-        new_trans.msgid = new_msgid
-        new_trans.msgstr = ""
-        final_translations.push(new_trans)
+      Hooks.register(:site, :pre_render) do |_site, payload|
+        renew_translations
       end
       
-      # uncomment this to remove translations that were not used
-      # not_used = final_translations.reject { |trans| @all_translations.get_translations.find {|msgid| trans.msgid == msgid}}
-      # final_translations = final_translations.reject {|trans1| not_used.find {|trans2| trans1.msgid == trans2.msgid}}
-      
-      final_translations.sort_by!(&:msgid)
-      
-      File.open(filename, 'w'){|f|f.print(GetPomo::PoFile.to_text(final_translations))}
+      Hooks.register(:site, :post_write) do |_site, payload|
+        if _site == site and not translations.nil?
+          save_translations translations.translations
+        end
+      end
+    end
+    
+    def renew_translations
+      languages.each do |language|
+        repos = [
+          FastGettext::TranslationRepository.build(text_domain, :type=>:logger, :callback=>translations),
+          FastGettext::TranslationRepository.build(text_domain, :path => translations_folder, :type => :po)
+        ]
+        FastGettext.add_text_domain(text_domain, :type=>:chain, :chain=>repos)
+      end
+      FastGettext.text_domain = text_domain
+   end
+
+    
+    # use the "translations_folder" tag from the _config.yml or default "_i18n"
+    def translations_folder
+      site.in_source_dir(site.config["translations_folder"] || "_i18n")
+    end
+    
+    def add_translated_sites
+      default_language = languages.first
+      translated_pages = []
+      site.pages.reject! do |page|
+        to_translate = page.data["translate"]
+        if to_translate
+          languages.each do |language|
+            translated_pages << TranslatedPage.new(page, language, default_language)
+          end
+        end
+        to_translate
+      end
+      site.pages.concat(translated_pages)
+    end
+    
+    def save_translations(translations)
+      if translations.empty?
+        return
+      end
+      site.config["exclude"] ||= []
+      unless site.config["exclude"].include? pot_file
+        site.config["exclude"] << pot_file 
+      end
+      File.open(pot_file, 'w') do |file|
+        file.write('msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ' + languages.first + '\n"
+"X-Generator: ' + self.class.name + '\n"
+
+')
+        file.print(GetPomo::PoFile.to_text(translations))
+      end
     end
   end
 
@@ -114,12 +185,31 @@ module Jekyll
     end
 
     def render(context)
+      site = context.registers[:site]
+      page = context.registers[:page]
+      language = page["language"]
+      if language.nil?
+        default_language = page["default_language"].to_s
+        raise ("Missing language! Either put 'language: " + default_language + 
+               "' or 'translate: true' into the header")
+      end
+      add_localization_to_dependency(site, language, page["path"]) if page.key?("path")
+
+      FastGettext.locale = language
       candidate = _(@key)
 
       if candidate == ""
         candidate = @key
       end
       candidate
+    end
+    
+    def add_localization_to_dependency(site, language, path)
+      po_file = site.pot_localization_plugin.po_file(language)
+      site.regenerator.add_dependency(
+        site.in_source_dir(path),
+        po_file
+      )
     end
   end
 end

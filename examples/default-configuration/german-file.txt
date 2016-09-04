@@ -1,0 +1,6 @@
+---
+language: de
+---
+
+{% t This file is translated into German only. %}
+

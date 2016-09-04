@@ -1,0 +1,9 @@
+
+   Übersetzungsbeispiel
+   =-=-=-=-=-=-=-=-=-=-=-   
+
+Diese Datei wird in dem Ordner ihrer Sprache platziert.
+
+
+--------------------------------------------------------------------------------
+Sprache: de

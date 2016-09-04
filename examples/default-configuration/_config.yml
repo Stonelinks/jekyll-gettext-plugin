@@ -1,0 +1,10 @@
+# the languages to look for
+languages: ["en", "de"]
+
+# the name of the text domain.
+# This is the name of the .pot and .po files.
+text_domain: "website"
+
+# the folder relative to the _config.yml
+# where the translations are placed inside
+translations_folder: "_i18n"

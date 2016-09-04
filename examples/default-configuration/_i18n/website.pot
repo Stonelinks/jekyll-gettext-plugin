@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"X-Generator: Jekyll::PotLocalizationPlugin\n"
+
+msgid "Translation Example"
+msgstr ""
+
+msgid "This file is translated into German only."
+msgstr ""
+
+msgid "This file is placed in the folder of the language."
+msgstr ""
+
+msgid "Language:"
+msgstr ""
