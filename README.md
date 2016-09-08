@@ -1,8 +1,8 @@
-#Jekyll gettext plugin
+# Jekyll gettext plugin
 
-A quick and dirty i18n plugin for jekyll based on gettext and po files.  
+[![Gem Version](https://badge.fury.io/rb/jekyll-gettext-plugin.svg)](https://badge.fury.io/rb/jekyll-gettext-plugin)
 
-
+A quick and dirty i18n plugin for jekyll based on gettext and po files.
 
 A lot of inspiration taken from [jekyll-multiple-languages-plugin](https://github.com/screeninteraction/jekyll-multiple-languages-plugin), it was just a little overkill for my needs and I wasn't a fan of managing translations in yaml files.
 
@@ -22,15 +22,15 @@ Or install it yourself as:
 
 ## Usage
 
-###Examples
+### Examples
 
 Have a look at the [examples](examples) folder.
 
-###Configuration
+### Configuration
 
 Add the i18n configuration to your _config.yml:
 
-```yaml	
+```yaml
 languages: ["en", "ja"]
 ```
 
@@ -64,16 +64,16 @@ Create this folder structure in your Jekyll project as an example:
 
 To add a string to your site use one of these
 
-```liquid	
+```liquid
 ---
 translate: true
 ---
 
 {% t key %}
-or 
+or
 {% translate key %}
 ```
-	
+
 These are liquid tags. They will pick the correct string from the correct `website.po` file during compilation for that language, or add it if no translation exists so you can fill it in later.
 
 All files with a `translate` field inside the yaml header are put in the folders of their languages.
@@ -81,7 +81,7 @@ Without the `translate` field they remain where they are as usual.
 
 You can translate variables in the header like this:
 
-```liquid	
+```liquid
 ---
 translate:
   title: Main Page
