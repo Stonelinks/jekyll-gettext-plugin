@@ -94,24 +94,6 @@ Whenever you save the po file, a `jekyll serve` rebuilds the site.
 
 Make sure all files are saved in UTF-8 encoding.
 
-All files with a `translate` field inside the yaml header are put in the folders of their languages.
-Without the `translate` field they remain where they are as usual.
-
-You can translate variables in the header like this:
-
-```liquid	
----
-translate:
-  title: Main Page
----
-```
-
-All translations automatically turn up in the `_i18n/website.pot` file.
-You can translate them using [Poedit](https://poedit.net/download).
-Whenever you save the po file, a `jekyll serve` rebuilds the site.
-
-Make sure all files are saved in UTF-8 encoding.
-
 ## Contributing
 
 1. Fork it ( http://github.com/Stonelinks/jekyll-gettext-plugin/fork )
