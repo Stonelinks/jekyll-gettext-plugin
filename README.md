@@ -1,5 +1,7 @@
 #Jekyll gettext plugin
 
+[![Gem Version](https://badge.fury.io/rb/jekyll-gettext-plugin.svg)](https://badge.fury.io/rb/jekyll-gettext-plugin)
+
 A quick and dirty i18n plugin for jekyll based on gettext and po files.  
 
 
