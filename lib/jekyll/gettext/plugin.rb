@@ -67,7 +67,11 @@ module Jekyll
     end
     
     def url
-      "/" + language + super
+        unless language == site.config["default_language"]
+            "/" + language + super
+        else
+            "/"
+        end
     end
   end
 
